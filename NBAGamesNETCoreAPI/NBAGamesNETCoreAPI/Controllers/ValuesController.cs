@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
-using NBAGamesNETCoreAPI.Context;
 
 namespace NBAGamesNETCoreAPI.Controllers
 {
@@ -11,13 +7,6 @@ namespace NBAGamesNETCoreAPI.Controllers
     [ApiController]
     public class ValuesController : Controller
     {
-        private readonly DummyContext _context;
-
-        public ValuesController(DummyContext context)
-        {
-            _context = context;
-        }
-
         // GET api/values
         [HttpGet]
         public ActionResult<IEnumerable<string>> Get()

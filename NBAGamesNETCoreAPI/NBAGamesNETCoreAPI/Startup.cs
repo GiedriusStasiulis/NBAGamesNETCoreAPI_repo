@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NBAGamesNETCoreAPI.BackgroundServices;
-using NBAGamesNETCoreAPI.Context;
+using NBAGamesNETCoreAPI.DataContexts;
 
 namespace NBAGamesNETCoreAPI
 {
@@ -21,9 +21,9 @@ namespace NBAGamesNETCoreAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<DummyContext>(options =>
+            services.AddDbContext<AppDbContext>(options =>
             {
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
+                options.UseSqlServer(Configuration.GetConnectionString("NBAGuessTheScoreMSSQLDB"));
             });
 
             services.AddHostedService<MyNBAWebserviceBService>();
@@ -46,7 +46,7 @@ namespace NBAGamesNETCoreAPI
                 app.UseHsts();
             }
 
-            /*
+            /* //Migrate DB on start-up
             using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
             {
                 var context = serviceScope.ServiceProvider.GetRequiredService<DummyContext>();

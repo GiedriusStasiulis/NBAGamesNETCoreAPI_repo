@@ -1,12 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Google.Cloud.Firestore;
 
 namespace NBAGamesNETCoreAPI.Models
 {
-    public class UpcomingGame
+    [FirestoreData]
+    public class UpcomingGame : BaseGame
     {
+        [FirestoreProperty]
+        private string GameStartTime { get; set; }
 
+        protected string GetGameTime()
+        {
+            string gameTime;
+
+            if (GameStartTime == null) { gameTime = "TBD"; }
+            else { gameTime = GameStartTime; }
+
+            return gameTime;
+        }
     }
 }

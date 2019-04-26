@@ -1,12 +1,8 @@
-﻿using NBAGamesNETCoreAPI.Context;
-using NBAGamesNETCoreAPI.Models;
-using System;
-using System.Linq;
-
-namespace NBAGamesNETCoreAPI.Data
+﻿namespace NBAGamesNETCoreAPI.Data
 {
     public class DbInitializer
     {
+        /*
         public static void Initialize(DummyContext context)
         {
             context.Database.EnsureCreated();
@@ -27,5 +23,6 @@ namespace NBAGamesNETCoreAPI.Data
             }
             context.SaveChanges();
         }
+        */
     }
 }

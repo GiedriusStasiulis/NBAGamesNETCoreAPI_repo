@@ -3,15 +3,12 @@ using Google.Cloud.Firestore;
 using Google.Cloud.Storage.V1;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using NBAGamesNETCoreAPI.Context;
 using NBAGamesNETCoreAPI.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace NBAGamesNETCoreAPI.BackgroundServices
 {
@@ -60,7 +57,7 @@ namespace NBAGamesNETCoreAPI.BackgroundServices
         public async Task FetchDataFromWebAsync()
         {
             Debug.WriteLine("Task 1: Starting");
-
+            /*
             var data = new DummyData { Name = "Test", Age = 21, Updated = DateTime.Now.ToString("h:mm:ss tt") };
             var data2 = new DummyData { Name = "Test2", Age = 1, Updated = DateTime.Now.ToString("h:mm:ss tt") };
             var data3 = new DummyData { Name = "Test3", Age = 1, Updated = DateTime.Now.ToString("h:mm:ss tt") };
@@ -71,11 +68,11 @@ namespace NBAGamesNETCoreAPI.BackgroundServices
 
             using (var scope = _serviceScopeFactory.CreateScope())
             {
-                var _context = scope.ServiceProvider.GetRequiredService<DummyContext>();
+                var _context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
                 for (int i = 0; i < dList.Count; i++)
                 {
-                    var dummyData = _context.DummyDatas.FirstOrDefault(a => a.Name == dList.ElementAt(i).Name);
+                    var dummyData = _context.UpcomingGames.FirstOrDefault(a => a.Name == dList.ElementAt(i).Name);
 
                     if (dummyData != null)
                     {
@@ -108,7 +105,7 @@ namespace NBAGamesNETCoreAPI.BackgroundServices
                     }
                 }
             }
-
+            */
             await Task.CompletedTask;
         }
 
@@ -134,7 +131,6 @@ namespace NBAGamesNETCoreAPI.BackgroundServices
                         Age = newData.ElementAt(i).Age,
                         Updated = newData.ElementAt(i).Updated
                     };
-
                     
                     DocumentReference document = await collection.AddAsync(data4Send);
                 }

@@ -1,14 +1,5 @@
-﻿using Google.Apis.Auth.OAuth2;
-using Microsoft.AspNetCore;
+﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using NBAGamesNETCoreAPI.Context;
-using NBAGamesNETCoreAPI.Data;
-using System;
-using Google.Cloud.Storage.V1;
-using Google.Cloud.Vision.V1;
-using Grpc.Auth;
 
 namespace NBAGamesNETCoreAPI
 {
@@ -17,7 +8,7 @@ namespace NBAGamesNETCoreAPI
         public static void Main(string[] args)
         {
             var host = CreateWebHostBuilder(args).Build();
-
+            /*
             using (var scope = host.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
@@ -31,7 +22,7 @@ namespace NBAGamesNETCoreAPI
                     var logger = services.GetRequiredService<ILogger<Program>>();
                     logger.LogError(ex, "An error occurred while seeding the database.");
                 }
-            }
+            }*/
 
             host.Run();
         }
