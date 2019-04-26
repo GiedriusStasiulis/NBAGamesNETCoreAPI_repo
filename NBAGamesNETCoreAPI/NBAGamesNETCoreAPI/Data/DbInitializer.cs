@@ -13,12 +13,12 @@ namespace NBAGamesNETCoreAPI.Data
 
             if (context.DummyDatas.Any())
             {
-                return;   // DB has been seeded
+                return;   // DB context has been already seeded
             }
 
             var dummyDatas = new DummyData[]
             {
-                new DummyData{ Name="First", Age = 25, Updated = DateTime.Now.ToString("h:mm:ss tt") }
+                new DummyData{ Name="Test", Age = 25, Updated = DateTime.Now.ToString("h:mm:ss tt") }
                 //More data to be seeded if needed
             };
             foreach(DummyData dd in dummyDatas)

@@ -6,7 +6,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NBAGamesNETCoreAPI.BackgroundServices;
 using NBAGamesNETCoreAPI.Context;
-using NBAGamesNETCoreAPI.Data;
 
 namespace NBAGamesNETCoreAPI
 {
@@ -27,8 +26,9 @@ namespace NBAGamesNETCoreAPI
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
             });
 
-            services.AddHostedService<BServ_FeedDataToEF>();
-
+            services.AddHostedService<MyNBAWebserviceBService>();
+            services.AddTransient<IBServiceAsyncTasks, BServiceAsyncTasks>();
+           
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddSession();
         }
@@ -46,11 +46,12 @@ namespace NBAGamesNETCoreAPI
                 app.UseHsts();
             }
 
+            /*
             using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
             {
                 var context = serviceScope.ServiceProvider.GetRequiredService<DummyContext>();
-                context.Database.Migrate();
-            }
+                //context.Database.Migrate();
+            }*/
 
             app.UseHttpsRedirection();
             app.UseMvc();

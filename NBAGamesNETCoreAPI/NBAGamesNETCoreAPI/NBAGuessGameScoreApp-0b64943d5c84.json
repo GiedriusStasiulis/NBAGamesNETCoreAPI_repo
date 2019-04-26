@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "nbaguessgamescoreapp",
+  "private_key_id": "0b64943d5c846f90c750af37f73947ba02443634",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC71bI0CFA64wna\nixlKF164N6bTn4DvVYhln3HwmJsI6sCFcj4tw7lXZSh0RsqAaZhzdBqEz0pCGy/A\n0XoG+ab4moKRR93YLcsrXYLI0Tev7D+iM4ARVI2M/s8XCSu1jr5Ig3gfPNbflQOL\neTN4HLL71GUgahKLWMfuVRO9TGfxuumh719ZruTg+iH34i7fZ7l7q1JrH+vOUn4Z\nzJJipEIw8CE2+0mk0+gtaXVW3TwYwkQE2tUQSp+Sq17ATxsanxkrD5JeGc39Igi+\nqlgCC+vTOKHkhIUk+owiXCIO4+reP+gscsJNzH/bZO3GQVNIPEqMikCEcZuSU4Oz\ngmpvyjB5AgMBAAECggEANhTlvciE/SeAn018hxIqggT4AieDMqXgY04gusLdpJge\nvW1yzK91bl3gY3Y8ePOuYtOTjRi4C0eTnMNTjK2V7y9hl53nGIa64C4I6XQfwgXW\nHogQgCzloqp9Cudnj9tdGzjLPcdBINfhUOehM5yjxhFV2prf4wI5cnxJdjAJH5aQ\ncBKUoysNyK15qQImC4A40lc+xV0/GX+GfLbD9Q7UFT9vF+NFWTKOQG13BDqhxKbk\nmeNbBoqrIkEl3FbuSxYY4uYSsM9am9ussfr3wrf2BL+IshIEcVH801eJAGo82wob\nyr477TRVIEo1K7DGl0EFI9URle3MUzgEiA4g7/dBxwKBgQDr8bUfnnZUKVj3GScx\n1LunUs2J5MHyJfa1OcuUZCTsc0OcikVLNyhjC7c/1Y73JeYt4cVWJz6G+2bnKK1o\nJNtazBhPNy/25ByGKxsFgQ97DpzHWJOObjdtv8XT/pYKJWYQVOm+ezneDiAGFNrf\n3cy8W5yY6Bev6GsRQNSrVftQwwKBgQDLzRj66rPQbJZzq4nXfI/4Nk9pPIrxbsyl\ny20hn4THtVY6daNXzq5iItir/RuxLKw4GQ8DD09Z9sEHoAhIevBAB5GT0nq8R6rX\niyjlXNdIz4y9sEHC0qZa3lbVn99RV/orIYWSzD2FyNr7dhYqQ0fAbmWgrZioNz4z\nKFSA9NzmEwKBgQDVP6vFfTJTlN9czfYX2r8UVwmARSpp0pgtaaQvZWfd8bu9I1fH\nyH2PL4qbfkht5mopM/JokKW52EVETgaUpyM+6FJcXnPSgI+rUBBnJCO6xBU9MziC\nNemRHxANL/+qAe1Ce4yb5cICid+1v2mnhk9COsbJiJPIIJeMi3zrspWngwKBgQC5\nh0ufWLw7GC9au6VveuDhWCewqMHgCjrZD7iYbEyHNah67Y62p9uOUSSoZXGpN/7L\nztwgr/ZP8tdE5sXDnc9Kqtk3FdxPvHplYDTpoDwH95GrOWKURgnVHSU1siWtOobu\nbsTXn4C+YtwfISAKd1dBcf6oaIBZWnkQPz22a7MQ6wKBgANCrTYohsItHhbt42I2\nVjGG3BKN0KBlMDfq4pDe2Zl0or7J0I4ourJ4G2ad1pgXpEPwLubwCbUmmaXdUrzR\ntejC8q2Nlm0poLuyBWbCTgjKpfvge8sSdUiCCfek5vPEl2rgCDHf0rBGmcoooG2F\nZjqLfiOMtDognwaFUhdYEA2R\n-----END PRIVATE KEY-----\n",
+  "client_email": "gstasiulisserviceacc@nbaguessgamescoreapp.iam.gserviceaccount.com",
+  "client_id": "103385961806469381790",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/gstasiulisserviceacc%40nbaguessgamescoreapp.iam.gserviceaccount.com"
+}
