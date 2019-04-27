@@ -3,7 +3,7 @@
 namespace NBAGamesNETCoreAPI.Models
 {
     [FirestoreData]
-    public class LiveGame : BaseGame
+    public class LiveGame
     {
         //For live games
         [FirestoreProperty]
