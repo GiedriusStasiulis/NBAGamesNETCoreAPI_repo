@@ -99,7 +99,7 @@ namespace NBAGamesNETCoreAPI.BackgroundServices
                         if(rObj.Games.ElementAt(i).StartTimeEastern.Equals(""))
                         {
                             upGame.GameStartTimeUTC = "TBD";
-                            string gDate = upGame.GameStartDateTimeUTC.ToString("yyyyMMdd", CultureInfo.InvariantCulture);
+                            string gDate = upGame.GameStartDateTimeUTC.ToString("dd-MMM-yyyy", CultureInfo.InvariantCulture);
                             upGame.GameDateUTC = gDate;
                         }
 
@@ -107,7 +107,7 @@ namespace NBAGamesNETCoreAPI.BackgroundServices
                         {
                             string gTime = upGame.GameStartDateTimeUTC.ToString("HH:mm tt", CultureInfo.InvariantCulture);
                             upGame.GameStartTimeUTC = gTime;
-                            string gDate = upGame.GameStartDateTimeUTC.ToString("yyyyMMdd", CultureInfo.InvariantCulture);
+                            string gDate = upGame.GameStartDateTimeUTC.ToString("dd-MMM-yyyy", CultureInfo.InvariantCulture);
                             upGame.GameDateUTC = gDate;
                         }                        
 
@@ -143,14 +143,8 @@ namespace NBAGamesNETCoreAPI.BackgroundServices
             {
                 var _context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-                Debug.WriteLine("ALL GAMES: " + allGames.Count);
-
-                int i = 0;
-
                 foreach (var game in allGames)
                 {
-                    i = i + 1;
-
                     var upGameCheckExists = _context.AllGames.FirstOrDefault(a => a.GameId == game.GameId);
                     
                     if (upGameCheckExists != null)
@@ -207,7 +201,9 @@ namespace NBAGamesNETCoreAPI.BackgroundServices
                         Debug.WriteLine("Task 1: Adding new entity");
                         game.OrderNo = _context.AllGames.Count() + 1;
                         _context.Add(game);                        
-                        _context.SaveChanges();                        
+                        _context.SaveChanges();         
+
+                        newData.Add(game);
                     }
                 }
             }         
@@ -244,20 +240,9 @@ namespace NBAGamesNETCoreAPI.BackgroundServices
                         TeamAScore = newData.ElementAt(i).TeamAScore,
                         TeamBScore = newData.ElementAt(i).TeamBScore,
                         LastUpdated = DateTime.Now.ToString("dd/MM/yyyy h:mm:ss tt")                    
-                    };                    
-                    
-                    //await Task.Delay(1000);
+                    };
 
-                    //Check if game with same ID already exists in FS (before adding it to FS) in case data in MSSQLDB dissapeared ¯\_(ツ)_/¯
-                    
-                    Query query = upGamesRef.WhereEqualTo("GameId", dataToSend.GameId);
-                    QuerySnapshot querySnapshot = await query.GetSnapshotAsync();
-
-                    if(querySnapshot.Count == 0)
-                    {
-                        Debug.WriteLine("Task 2: Data sent to firestore");
-                        DocumentReference document = await upGamesRef.AddAsync(dataToSend);
-                    }           
+                    DocumentReference document = await upGamesRef.AddAsync(dataToSend);
                 } 
             }
             

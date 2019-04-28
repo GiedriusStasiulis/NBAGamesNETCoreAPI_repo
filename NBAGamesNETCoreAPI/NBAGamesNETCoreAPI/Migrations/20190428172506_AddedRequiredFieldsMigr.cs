@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace NBAGamesNETCoreAPI.Migrations
 {
-    public partial class InitMigr : Migration
+    public partial class AddedRequiredFieldsMigr : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -34,12 +34,31 @@ namespace NBAGamesNETCoreAPI.Migrations
                 {
                     table.PrimaryKey("PK_AllGames", x => x.Id);
                 });
+
+            migrationBuilder.CreateTable(
+                name: "AllGuesses",
+                columns: table => new
+                {
+                    ID = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    UserId = table.Column<string>(nullable: true),
+                    GameId = table.Column<string>(nullable: true),
+                    SelTeam = table.Column<string>(nullable: true),
+                    ByPts = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AllGuesses", x => x.ID);
+                });
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
                 name: "AllGames");
+
+            migrationBuilder.DropTable(
+                name: "AllGuesses");
         }
     }
 }

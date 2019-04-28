@@ -1,10 +1,9 @@
 ﻿using Google.Cloud.Firestore;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace NBAGamesNETCoreAPI.Models.RootModels
+namespace NBAGamesNETCoreAPI.Models
 {
     [FirestoreData]
     public class GameToFirestore

@@ -19,7 +19,7 @@ namespace NBAGamesNETCoreAPI.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("NBAGamesNETCoreAPI.Models.RootModels.GameToFirestore", b =>
+            modelBuilder.Entity("NBAGamesNETCoreAPI.Models.GameToFirestore", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -58,6 +58,25 @@ namespace NBAGamesNETCoreAPI.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("AllGames");
+                });
+
+            modelBuilder.Entity("NBAGamesNETCoreAPI.Models.GuessFromAndroid", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("ByPts");
+
+                    b.Property<string>("GameId");
+
+                    b.Property<string>("SelTeam");
+
+                    b.Property<string>("UserId");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("AllGuesses");
                 });
 #pragma warning restore 612, 618
         }
