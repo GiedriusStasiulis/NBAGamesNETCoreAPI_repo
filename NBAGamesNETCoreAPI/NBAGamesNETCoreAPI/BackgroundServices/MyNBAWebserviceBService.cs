@@ -9,6 +9,7 @@ namespace NBAGamesNETCoreAPI.BackgroundServices
     {
         private readonly IBServiceAsyncTasks _bServiceAsyncTasks;
 
+        //DI for async tasks
         public MyNBAWebserviceBService(IBServiceAsyncTasks bServiceAsyncTasks)
         {
             _bServiceAsyncTasks = bServiceAsyncTasks;
@@ -17,7 +18,7 @@ namespace NBAGamesNETCoreAPI.BackgroundServices
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             Debug.WriteLine("Starting background service...");
-            Debug.WriteLine("Setting up FirestoreDb...");
+            Debug.WriteLine("Setting up and connecting to FirestoreDb...");
 
             await _bServiceAsyncTasks.SetUpFirestoreDbAsync();
 
@@ -32,8 +33,8 @@ namespace NBAGamesNETCoreAPI.BackgroundServices
 
                 Debug.WriteLine("Background service tasks finished! Waiting to start again...");
 
-                await Task.Delay(10000, stoppingToken);
-            }            
+                await Task.Delay(60000, stoppingToken);
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NBAGamesNETCoreAPI.Models;
+using NBAGamesNETCoreAPI.Models.RootModels;
 
 namespace NBAGamesNETCoreAPI.DataContexts
 {
@@ -7,13 +8,13 @@ namespace NBAGamesNETCoreAPI.DataContexts
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-        public DbSet<UpcomingGame> UpcomingGames { get; set; }
+        public DbSet<GameToFirestore> AllGames { get; set; }
         //public DbSet<LiveGame> LiveGames { get; set; }
         //public DbSet<FinishedGame> FinishedGames { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<UpcomingGame>().ToTable("UpcomingGames");
+            modelBuilder.Entity<GameToFirestore>().ToTable("AllGames");
         }
     }
 }

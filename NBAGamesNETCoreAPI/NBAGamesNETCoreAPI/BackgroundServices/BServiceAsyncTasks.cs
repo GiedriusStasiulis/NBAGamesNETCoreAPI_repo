@@ -28,9 +28,9 @@ namespace NBAGamesNETCoreAPI.BackgroundServices
 
         private DateTime startingDate;       
 
-        private List<UpcomingGame> allGames = new List<UpcomingGame>();
-        private List<UpcomingGame> newData = new List<UpcomingGame>();
-        private List<UpcomingGame> updatedData = new List<UpcomingGame>();        
+        private List<GameToFirestore> allGames = new List<GameToFirestore>();
+        private List<GameToFirestore> newData = new List<GameToFirestore>();
+        private List<GameToFirestore> updatedData = new List<GameToFirestore>();        
 
         public BServiceAsyncTasks(IServiceScopeFactory serviceScopeFactory, IHostingEnvironment HostingEnv)
         {
@@ -74,129 +74,193 @@ namespace NBAGamesNETCoreAPI.BackgroundServices
 
             CollectionReference teamRef = fstoreDb.Collection("teams");            
 
-            using (var webCLient = new WebClient())
+            //Fetch jsons from all days until the end of season
+            foreach(DateTime day in EachDay(startingDate,GetSeasonEndDate()))
             {
-                string jsonRoot = webCLient.DownloadString(string.Format("https://data.nba.net/prod/v2/{0}/scoreboard.json", GetStartingDateString()));                
-                RootObject rObj = JsonConvert.DeserializeObject<RootObject>(jsonRoot);
-
-                for(int i = 0; i < rObj.NumGames; i++)
+                using (var webCLient = new WebClient())
                 {
-                    UpcomingGame upGame = new UpcomingGame { GameId = rObj.Games.ElementAt(i).GameId,
-                                                             GameStartDateTimeUTC = rObj.Games.ElementAt(i).StartTimeUTC,
-                                                             TeamATriCode = rObj.Games.ElementAt(i).HTeam.TriCode,
-                                                             TeamBTriCode = rObj.Games.ElementAt(i).Vteam.TriCode,
-                                                             LastUpdated = DateTime.Now.ToString("dd/MM/yyyy h:mm:ss tt")};
+                    string jsonRoot = webCLient.DownloadString(string.Format("https://data.nba.net/prod/v2/{0}/scoreboard.json", day.ToString("yyyyMMdd")));
+                    RootObject rObj = JsonConvert.DeserializeObject<RootObject>(jsonRoot);
 
-                    Query query1 = teamRef.WhereEqualTo("teamShortName", upGame.TeamATriCode);
-                    QuerySnapshot query1Snapshot = await query1.GetSnapshotAsync();
-
-                    foreach(DocumentSnapshot dSnapshot in query1Snapshot.Documents)
+                    for (int i = 0; i < rObj.NumGames; i++)
                     {
-                        Dictionary<string, object> documentDictionary = dSnapshot.ToDictionary();
+                        GameToFirestore upGame = new GameToFirestore
+                        {
+                            GameId = rObj.Games.ElementAt(i).GameId,
+                            GameStartDateTimeUTC = rObj.Games.ElementAt(i).StartTimeUTC,
+                            TeamATriCode = rObj.Games.ElementAt(i).HTeam.TriCode,
+                            TeamBTriCode = rObj.Games.ElementAt(i).VTeam.TriCode,
+                            StatusNum = rObj.Games.ElementAt(i).StatusNum,
+                            TeamAScore = rObj.Games.ElementAt(i).HTeam.Score,
+                            TeamBScore = rObj.Games.ElementAt(i).VTeam.Score,
+                            LastUpdated = DateTime.Now.ToString("dd/MM/yyyy h:mm:ss tt")
+                        };
 
-                        upGame.TeamAFullName = documentDictionary["teamFullName"].ToString();
-                        upGame.TeamALogoSrc = documentDictionary["teamLogoSrc"].ToString();
+                        if(rObj.Games.ElementAt(i).StartTimeEastern.Equals(""))
+                        {
+                            upGame.GameStartTimeUTC = "TBD";
+                            string gDate = upGame.GameStartDateTimeUTC.ToString("yyyyMMdd", CultureInfo.InvariantCulture);
+                            upGame.GameDateUTC = gDate;
+                        }
+
+                        else
+                        {
+                            string gTime = upGame.GameStartDateTimeUTC.ToString("HH:mm tt", CultureInfo.InvariantCulture);
+                            upGame.GameStartTimeUTC = gTime;
+                            string gDate = upGame.GameStartDateTimeUTC.ToString("yyyyMMdd", CultureInfo.InvariantCulture);
+                            upGame.GameDateUTC = gDate;
+                        }                        
+
+                        Query query1 = teamRef.WhereEqualTo("teamShortName", upGame.TeamATriCode);
+                        QuerySnapshot query1Snapshot = await query1.GetSnapshotAsync();
+
+                        foreach (DocumentSnapshot dSnapshot in query1Snapshot.Documents)
+                        {
+                            Dictionary<string, object> documentDictionary = dSnapshot.ToDictionary();
+
+                            upGame.TeamAFullName = documentDictionary["teamFullName"].ToString();
+                            upGame.TeamALogoSrc = documentDictionary["teamLogoSrc"].ToString();
+                        }
+
+                        Query query2 = teamRef.WhereEqualTo("teamShortName", upGame.TeamBTriCode);
+                        QuerySnapshot query2Snapshot = await query2.GetSnapshotAsync();
+
+                        foreach (DocumentSnapshot dSnapshot in query2Snapshot.Documents)
+                        {
+                            Dictionary<string, object> documentDictionary = dSnapshot.ToDictionary();
+
+                            upGame.TeamBFullName = documentDictionary["teamFullName"].ToString();
+                            upGame.TeamBLogoSrc = documentDictionary["teamLogoSrc"].ToString();
+                        }
+
+                        allGames.Add(upGame);
                     }
-
-                    Query query2 = teamRef.WhereEqualTo("teamShortName", upGame.TeamBTriCode);
-                    QuerySnapshot query2Snapshot = await query2.GetSnapshotAsync();
-
-                    foreach (DocumentSnapshot dSnapshot in query2Snapshot.Documents)
-                    {
-                        Dictionary<string, object> documentDictionary = dSnapshot.ToDictionary();
-
-                        upGame.TeamBFullName = documentDictionary["teamFullName"].ToString();
-                        upGame.TeamBLogoSrc = documentDictionary["teamLogoSrc"].ToString();
-                    }
-
-                    allGames.Add(upGame);
                 }
-            }
+            }                 
 
+            //Insert new entries to DbContext
             using (var scope = _serviceScopeFactory.CreateScope())
             {
                 var _context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-                for (int i = 0; i < allGames.Count; i++)
-                {
-                    var upGameCheckExists = _context.UpcomingGames.FirstOrDefault(a => a.GameId == allGames.ElementAt(i).GameId);
+                Debug.WriteLine("ALL GAMES: " + allGames.Count);
 
+                int i = 0;
+
+                foreach (var game in allGames)
+                {
+                    i = i + 1;
+
+                    var upGameCheckExists = _context.AllGames.FirstOrDefault(a => a.GameId == game.GameId);
+                    
                     if (upGameCheckExists != null)
                     {
-                        if (!upGameCheckExists.GameStartDateTimeUTC.Equals(allGames.ElementAt(i).GameStartDateTimeUTC))
+                        if (!upGameCheckExists.StatusNum.Equals(game.StatusNum))
                         {
-                            Debug.WriteLine("Task 1: Updating existing entity");
-                            updatedData.Add(allGames.ElementAt(i));
+                            Debug.WriteLine("Task 1: Updating status num for existing entity");
+                            updatedData.Add(game);
 
                             _context.Attach(upGameCheckExists);
-                            upGameCheckExists.GameStartDateTimeUTC = allGames.ElementAt(i).GameStartDateTimeUTC;
+                            upGameCheckExists.StatusNum = game.StatusNum;
+                            _context.SaveChanges();
+                        }
+
+                        else if (!upGameCheckExists.TeamAScore.Equals(game.TeamAScore))
+                        {
+                            Debug.WriteLine("Task 1: Updating team A score for existing entity");
+                            updatedData.Add(game);
+
+                            _context.Attach(upGameCheckExists);
+                            upGameCheckExists.TeamAScore = game.TeamAScore;
+                            _context.SaveChanges();
+                        }
+
+                        else if (!upGameCheckExists.TeamBScore.Equals(game.TeamBScore))
+                        {
+                            Debug.WriteLine("Task 1: Updating team B score for existing entity");
+                            updatedData.Add(game);
+
+                            _context.Attach(upGameCheckExists);
+                            upGameCheckExists.TeamBScore = game.TeamBScore;
+                            _context.SaveChanges();
+                        }
+
+                        else if(!upGameCheckExists.GameStartDateTimeUTC.Equals(game.GameStartDateTimeUTC))
+                        {
+                            Debug.WriteLine("Task 1: Updating existing entity");
+                            updatedData.Add(game);
+
+                            _context.Attach(upGameCheckExists);
+                            upGameCheckExists.GameStartDateTimeUTC = game.GameStartDateTimeUTC;
                             _context.SaveChanges();
                         }
 
                         Debug.WriteLine("Task 1: No action needed on existing entity");
 
                         _context.Attach(upGameCheckExists);
-                        upGameCheckExists.LastUpdated = allGames.ElementAt(i).LastUpdated;
+                        upGameCheckExists.LastUpdated = game.LastUpdated;                        
                         _context.SaveChanges();
                     }
 
                     else
                     {
                         Debug.WriteLine("Task 1: Adding new entity");
-                        newData.Add(allGames.ElementAt(i));
-
-                        _context.Add(allGames.ElementAt(i));
-                        _context.SaveChanges();
+                        game.OrderNo = _context.AllGames.Count() + 1;
+                        _context.Add(game);                        
+                        _context.SaveChanges();                        
                     }
                 }
-            }
-            
-            await Task.CompletedTask;            
+            }         
         }
 
         public async Task CheckEntitiesNSendToFirestoreAsync()
         {
             Debug.WriteLine("Task 2: Starting");
 
-            CollectionReference upGamesRef = fstoreDb.Collection("upcomingGames");
+            CollectionReference upGamesRef = fstoreDb.Collection("allGames");
 
             if (newData.Count != 0)
             {
                 Debug.WriteLine("Task 2: New data list count: " + newData.Count);
-                Debug.WriteLine("Task 2: Updated data list count: " + updatedData.Count);                
-
+                Debug.WriteLine("Task 2: Updated data list count: " + updatedData.Count);
+                                
                 for (int i = 0; i < newData.Count; i++)
                 {
                     Debug.WriteLine("Task 2: New data - " + newData.ElementAt(i).GameId);
 
-                    UpcomingGame dataToSend = new UpcomingGame
+                    GameToFirestore dataToSend = new GameToFirestore
                     {
+                        OrderNo = newData.ElementAt(i).OrderNo,
                         GameId = newData.ElementAt(i).GameId,
-                        GameStartDateTimeUTC = newData.ElementAt(i).GameStartDateTimeUTC,
+                        GameDateUTC = newData.ElementAt(i).GameDateUTC,
+                        GameStartTimeUTC = newData.ElementAt(i).GameStartTimeUTC,
                         TeamATriCode = newData.ElementAt(i).TeamATriCode,
                         TeamAFullName = newData.ElementAt(i).TeamAFullName,
                         TeamALogoSrc = newData.ElementAt(i).TeamALogoSrc,
                         TeamBTriCode = newData.ElementAt(i).TeamBTriCode,
                         TeamBFullName = newData.ElementAt(i).TeamBFullName,
                         TeamBLogoSrc = newData.ElementAt(i).TeamBLogoSrc,
+                        StatusNum = newData.ElementAt(i).StatusNum,
+                        TeamAScore = newData.ElementAt(i).TeamAScore,
+                        TeamBScore = newData.ElementAt(i).TeamBScore,
                         LastUpdated = DateTime.Now.ToString("dd/MM/yyyy h:mm:ss tt")                    
-                    };
+                    };                    
+                    
+                    //await Task.Delay(1000);
 
                     //Check if game with same ID already exists in FS (before adding it to FS) in case data in MSSQLDB dissapeared ¯\_(ツ)_/¯
-
+                    
                     Query query = upGamesRef.WhereEqualTo("GameId", dataToSend.GameId);
                     QuerySnapshot querySnapshot = await query.GetSnapshotAsync();
 
-                    foreach (DocumentSnapshot documentSnapshot in querySnapshot.Documents)
+                    if(querySnapshot.Count == 0)
                     {
-                        if(!documentSnapshot.Exists)
-                        {
-                            DocumentReference document = await upGamesRef.AddAsync(dataToSend);
-                        }
-                    }                    
-                }
+                        Debug.WriteLine("Task 2: Data sent to firestore");
+                        DocumentReference document = await upGamesRef.AddAsync(dataToSend);
+                    }           
+                } 
             }
-
+            
             if (updatedData.Count != 0)
             {
                 for (int i = 0; i < updatedData.Count; i++)
@@ -212,7 +276,11 @@ namespace NBAGamesNETCoreAPI.BackgroundServices
                         { 
                             Dictionary<FieldPath, object> updates = new Dictionary<FieldPath, object>
                             {
-                                { new FieldPath("GameStartDateTimeUTC"), updatedData.ElementAt(i).GameStartDateTimeUTC }
+                                { new FieldPath("StatusNum"),updatedData.ElementAt(i).StatusNum },
+                                { new FieldPath("TeamAScore"),updatedData.ElementAt(i).TeamAScore },
+                                { new FieldPath("TeamBScore"),updatedData.ElementAt(i).TeamBScore },
+                                { new FieldPath("GameDateUTC"),updatedData.ElementAt(i).GameDateUTC },
+                                { new FieldPath("GameStartTimeUTC"),updatedData.ElementAt(i).GameStartTimeUTC }
                             };
 
                             await upGamesRef.Document(documentSnapshot.Id).UpdateAsync(updates);
@@ -224,17 +292,12 @@ namespace NBAGamesNETCoreAPI.BackgroundServices
             else
             {
                 Debug.WriteLine("Task 2: No new or updated data!");
-            }
-
-            newData.Clear();
-            updatedData.Clear();            
-
-            await Task.CompletedTask;
+            }                      
         }
 
         public void SetStartingDate()
         {
-            string currentDateStr = DateTime.Now.ToString("yyyyMMdd");
+            string currentDateStr = DateTime.Now.AddDays(-2).ToString("yyyyMMdd");
             //string currentDateStr = currentDate.ToString("yyyyMMdd", CultureInfo.InvariantCulture);
             startingDate = DateTime.ParseExact(currentDateStr,"yyyyMMdd", CultureInfo.InvariantCulture);
         }
@@ -248,7 +311,7 @@ namespace NBAGamesNETCoreAPI.BackgroundServices
 
         public DateTime GetSeasonEndDate()
         {
-            string seasonEndDateStr = "20190701";
+            string seasonEndDateStr = "20190630";
             DateTime seasonEndDate = DateTime.ParseExact(seasonEndDateStr,"yyyyMMdd", CultureInfo.InvariantCulture);
 
             return seasonEndDate;
@@ -257,6 +320,12 @@ namespace NBAGamesNETCoreAPI.BackgroundServices
         public void IncrementStartingDateByOne(DateTime startDate)
         {
             startDate.AddDays(1);
+        }
+
+        public IEnumerable<DateTime> EachDay(DateTime from, DateTime thru)
+        {
+            for (var day = from.Date; day.Date < thru.Date; day = day.AddDays(1))
+                yield return day;
         }
     }   
 }

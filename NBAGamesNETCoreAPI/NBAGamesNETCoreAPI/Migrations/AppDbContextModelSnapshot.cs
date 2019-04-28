@@ -19,21 +19,31 @@ namespace NBAGamesNETCoreAPI.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("NBAGamesNETCoreAPI.Models.UpcomingGame", b =>
+            modelBuilder.Entity("NBAGamesNETCoreAPI.Models.RootModels.GameToFirestore", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<string>("GameDateUTC");
+
                     b.Property<string>("GameId");
 
                     b.Property<DateTime>("GameStartDateTimeUTC");
 
+                    b.Property<string>("GameStartTimeUTC");
+
                     b.Property<string>("LastUpdated");
+
+                    b.Property<int>("OrderNo");
+
+                    b.Property<int>("StatusNum");
 
                     b.Property<string>("TeamAFullName");
 
                     b.Property<string>("TeamALogoSrc");
+
+                    b.Property<string>("TeamAScore");
 
                     b.Property<string>("TeamATriCode");
 
@@ -41,11 +51,13 @@ namespace NBAGamesNETCoreAPI.Migrations
 
                     b.Property<string>("TeamBLogoSrc");
 
+                    b.Property<string>("TeamBScore");
+
                     b.Property<string>("TeamBTriCode");
 
                     b.HasKey("Id");
 
-                    b.ToTable("UpcomingGames");
+                    b.ToTable("AllGames");
                 });
 #pragma warning restore 612, 618
         }

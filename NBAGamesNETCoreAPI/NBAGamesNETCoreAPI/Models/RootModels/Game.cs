@@ -12,9 +12,8 @@ namespace NBAGamesNETCoreAPI.Models.RootModels
         public DateTime StartTimeUTC { get; set; }
         public string StartDateEastern { get; set; }
         public string Clock { get; set; }
-        public GameDuration GameDuration { get; set; }
         public Period Period { get; set; }
-        public VTeam Vteam { get; set; }
+        public VTeam VTeam { get; set; }
         public HTeam HTeam { get; set; }
     }
 }
